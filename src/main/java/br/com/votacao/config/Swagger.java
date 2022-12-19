@@ -1,4 +1,4 @@
-package br.com.votacao.controller.config;
+package br.com.votacao.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,8 @@
 package br.com.votacao.controller;
 
 import br.com.votacao.controller.mapper.PautaRequestMapper;
+import br.com.votacao.controller.mapper.VotoRequestMapper;
+import br.com.votacao.controller.request.CriaVotoRequest;
 import br.com.votacao.controller.request.CriarPautaRequest;
 import br.com.votacao.controller.request.CriarSessaoPautaRequest;
 import br.com.votacao.model.dto.PautaDto;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Objects;
 import java.util.Optional;
 
 @RestController
@@ -20,9 +23,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PautaController {
 
-
     private final PautaService pautaService;
     private final PautaRequestMapper pautaRequestMapper;
+    private final VotoRequestMapper votoRequestMapper;
 
     @PostMapping(value = "criar")
     public ResponseEntity<?> criarPauta(@RequestBody @Valid CriarPautaRequest criarPautaRequest) {
@@ -43,4 +46,12 @@ public class PautaController {
         return ResponseEntity.badRequest().build();
     }
 
+    @PostMapping(value = "votar/{idPauta}")
+    public ResponseEntity<?> votar(@PathVariable Long idPauta, @RequestBody CriaVotoRequest criaVotoRequest) {
+        var voto = pautaService.votarInicio(idPauta, votoRequestMapper.toCriaVotoDto(criaVotoRequest));
+        if(Objects.nonNull(voto.getDataHoraVoto())) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
 }
