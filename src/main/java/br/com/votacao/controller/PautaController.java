@@ -40,7 +40,7 @@ public class PautaController {
     public ResponseEntity<?> sessaoVotacao(@PathVariable Long idPauta, CriarSessaoPautaRequest criarSessaoPautaRequest) {
         VotoDto votoDto = pautaService.sessaoVotacaoInicio(idPauta,
                 pautaRequestMapper.toSessaoPautaCriarDto(criarSessaoPautaRequest));
-        if(votoDto.getDataHoraVoto() != null) {
+        if(Objects.nonNull(votoDto.getDataHoraVoto())) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         return ResponseEntity.badRequest().build();

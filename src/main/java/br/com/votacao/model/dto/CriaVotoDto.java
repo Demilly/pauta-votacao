@@ -1,6 +1,5 @@
 package br.com.votacao.model.dto;
 
-import br.com.votacao.model.entity.VotoSessao;
 import br.com.votacao.model.entity.enums.IntencaoVoto;
 import lombok.Builder;
 import lombok.Data;
@@ -14,5 +13,4 @@ public class CriaVotoDto {
     private LocalDateTime dataHoraVoto;
     private Long idEleitor;
     private IntencaoVoto intencaoVoto;
-    private VotoSessao votoSessao;
 }

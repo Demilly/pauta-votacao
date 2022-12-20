@@ -52,8 +52,10 @@ public class PautaServiceImpl implements PautaService {
         Pauta pauta = pautaRepository.findById(idPauta)
                 .orElseThrow(PautaNaoLocalizadaException::new);
 
-        Optional<VotoSessao> votoSessao = Optional.ofNullable(votoSessaoRepository.findByPauta(idPauta)
-                .orElseThrow(JaExisteSessaoParaPautaException::new));
+        Optional<VotoSessao> votoSessao = votoSessaoRepository.findByPauta(idPauta);
+        if(votoSessao.isPresent()){
+            throw new JaExisteSessaoParaPautaException();
+        }
 
         if (sessaoPautaCriarDto.getDataHoraFechamentoSessao() != null && LocalDateTime.now().isAfter(sessaoPautaCriarDto.getDataHoraFechamentoSessao())) {
             throw new DataSessaoInferiorException();
@@ -76,8 +78,9 @@ public class PautaServiceImpl implements PautaService {
             throw new SessaoEncerradaExcpetion();
         }
         verificaEleitorJaVotou(votoSessao, criaVotoDto);
-
-        return votoMapper.toVotoDto(votoRepository.save(votoMapper.toVoto(criaVotoDto)));
+        var voto = votoRepository.save(votoMapper.toVoto(criaVotoDto));
+        voto.setVotoSessao(votoSessao);
+        return votoMapper.toVotoDto(voto);
     }
 
     public Map<IntencaoVoto, Long> result(Long idpauta) {

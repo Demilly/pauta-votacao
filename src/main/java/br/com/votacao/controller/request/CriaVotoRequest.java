@@ -19,6 +19,5 @@ public class CriaVotoRequest {
     private IntencaoVoto intencaoVoto;
     @NotBlank
     private Long idEleitor;
-    @NotNull
-    private VotoSessao votoSessao;
+
 }
