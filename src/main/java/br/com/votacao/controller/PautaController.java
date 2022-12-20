@@ -40,7 +40,7 @@ public class PautaController {
     public ResponseEntity<?> sessaoVotacao(@PathVariable Long idPauta, CriarSessaoPautaRequest criarSessaoPautaRequest) {
         VotoDto votoDto = pautaService.sessaoVotacaoInicio(idPauta,
                 pautaRequestMapper.toSessaoPautaCriarDto(criarSessaoPautaRequest));
-        if(Objects.nonNull(votoDto.getDataHoraVoto())) {
+        if (Objects.nonNull(votoDto.getDataHoraVoto())) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         return ResponseEntity.badRequest().build();
@@ -49,9 +49,14 @@ public class PautaController {
     @PostMapping(value = "votar/{idPauta}")
     public ResponseEntity<?> votar(@PathVariable Long idPauta, @RequestBody CriaVotoRequest criaVotoRequest) {
         var voto = pautaService.votarInicio(idPauta, votoRequestMapper.toCriaVotoDto(criaVotoRequest));
-        if(Objects.nonNull(voto.getDataHoraVoto())) {
+        if (Objects.nonNull(voto.getDataHoraVoto())) {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         return ResponseEntity.badRequest().build();
+    }
+
+    @GetMapping(value = "total-votacao/{idPauta}")
+    public ResponseEntity<?> contabilizarVotacao(@PathVariable Long idPauta) {
+        return ResponseEntity.ok(pautaService.contabilizarVotos(idPauta));
     }
 }

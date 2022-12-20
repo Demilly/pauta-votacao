@@ -53,7 +53,7 @@ public class PautaServiceImpl implements PautaService {
                 .orElseThrow(PautaNaoLocalizadaException::new);
 
         Optional<VotoSessao> votoSessao = votoSessaoRepository.findByPauta(idPauta);
-        if(votoSessao.isPresent()){
+        if (votoSessao.isPresent()) {
             throw new JaExisteSessaoParaPautaException();
         }
 
@@ -61,7 +61,7 @@ public class PautaServiceImpl implements PautaService {
             throw new DataSessaoInferiorException();
         }
         VotoSessao votoSessaoSaved = criaSessaoParaVotacao(pauta, sessaoPautaCriarDto.getDataHoraFechamentoSessao());
-        if(votoSessaoSaved != null)
+        if (votoSessaoSaved != null)
             return VotoDto.builder()
                     .dataHoraVoto(LocalDateTime.now())
                     .build();
@@ -72,9 +72,9 @@ public class PautaServiceImpl implements PautaService {
     public VotoDto votarInicio(Long idPauta, CriaVotoDto criaVotoDto) {
         VotoSessao votoSessao = getVotoSessao(idPauta)
                 .orElseThrow(() -> new PautaNaoLocalizadaException())
-                .orElseThrow(()-> new SessaoNaoLocalizadaException());
+                .orElseThrow(() -> new SessaoNaoLocalizadaException());
 
-        if(LocalDateTime.now().isAfter(votoSessao.getDataFechamento())) {
+        if (LocalDateTime.now().isAfter(votoSessao.getDataFechamento())) {
             throw new SessaoEncerradaExcpetion();
         }
         verificaEleitorJaVotou(votoSessao, criaVotoDto);
@@ -83,25 +83,28 @@ public class PautaServiceImpl implements PautaService {
         return votoMapper.toVotoDto(voto);
     }
 
-    public Map<IntencaoVoto, Long> result(Long idpauta) {
+    @Override
+    public Map<IntencaoVoto, Long> contabilizarVotos(Long idpauta) {
         return getVotoSessao(idpauta)
                 .map(vs -> vs.get().getVotos()
-                .stream()
-                .collect(Collectors.groupingBy(Voto::getIntencaoVoto,
-                    Collectors.counting()))).orElse(null);
+                        .stream()
+                        .collect(Collectors.groupingBy(Voto::getIntencaoVoto,
+                                Collectors.counting()))).orElse(null);
     }
 
-    public Optional<Optional<VotoSessao>> getVotoSessao(Long idPauta) {
+    private Optional<Optional<VotoSessao>> getVotoSessao(Long idPauta) {
         return Optional.ofNullable(votoSessaoRepository.findByPauta(idPauta));
     }
 
     private void verificaEleitorJaVotou(VotoSessao votoSessao, CriaVotoDto criaVotoDto) {
         Optional<Voto> voto = votoRepository.findById(criaVotoDto.getIdEleitor());
-        votoSessao.getVotos().stream().forEach(votoEleitorSessao -> {
-            if(votoEleitorSessao.getIdEleitor() == voto.get().getIdEleitor()){
-                throw new EleitorJaVotouExcpetion();
-            }
-        });
+        if (voto.isPresent()) {
+            votoSessao.getVotos().stream().forEach(votoEleitorSessao -> {
+                if (votoEleitorSessao.getIdEleitor() == voto.get().getIdEleitor()) {
+                    throw new EleitorJaVotouExcpetion();
+                }
+            });
+        }
     }
 
     private VotoSessao criaSessaoParaVotacao(Pauta pauta, LocalDateTime dataHoraFechamento) {

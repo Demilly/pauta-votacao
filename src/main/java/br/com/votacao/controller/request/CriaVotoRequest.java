@@ -1,6 +1,5 @@
 package br.com.votacao.controller.request;
 
-import br.com.votacao.model.entity.VotoSessao;
 import br.com.votacao.model.entity.enums.IntencaoVoto;
 import lombok.Builder;
 import lombok.Data;
