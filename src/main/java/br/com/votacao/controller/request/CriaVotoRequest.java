@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
@@ -18,5 +19,6 @@ public class CriaVotoRequest {
     private IntencaoVoto intencaoVoto;
     @NotBlank
     private Long idEleitor;
-
+    @NotEmpty
+    private String cpf;
 }

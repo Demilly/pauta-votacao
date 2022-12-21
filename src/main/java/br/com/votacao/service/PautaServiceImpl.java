@@ -1,5 +1,7 @@
 package br.com.votacao.service;
 
+import br.com.votacao.cliente.RestClientValidaCPF;
+import br.com.votacao.cliente.dto.ResponseStatusCpfDto;
 import br.com.votacao.model.dto.CriaVotoDto;
 import br.com.votacao.model.dto.PautaDto;
 import br.com.votacao.model.dto.SessaoPautaCriarDto;
@@ -39,9 +41,11 @@ public class PautaServiceImpl implements PautaService {
     private final VotoSessaoRepository votoSessaoRepository;
     private final VotoMapper votoMapper;
     private final VotoRepository votoRepository;
+    private final RestClientValidaCPF restClientValidaCPF;
 
     @Override
     public Optional<PautaDto> criaPauta(PautaDto pautaDto) {
+
         Optional<PautaDto> pautaSavedOptional =
                 Optional.ofNullable(pautaMapper.toPautaDto(pautaRepository.save(pautaMapper.toPauta(pautaDto))));
         return pautaSavedOptional;
@@ -78,9 +82,14 @@ public class PautaServiceImpl implements PautaService {
             throw new SessaoEncerradaExcpetion();
         }
         verificaEleitorJaVotou(votoSessao, criaVotoDto);
-        var voto = votoRepository.save(votoMapper.toVoto(criaVotoDto));
-        voto.setVotoSessao(votoSessao);
-        return votoMapper.toVotoDto(voto);
+
+        ResponseStatusCpfDto responseStatusCpfDto = restClientValidaCPF.getValidaCPFStatus(criaVotoDto.getCpf());
+        if (responseStatusCpfDto.getStatus().equals("ABLE_TO_VOTE")) {
+            var voto = votoRepository.save(votoMapper.toVoto(criaVotoDto));
+            voto.setVotoSessao(votoSessao);
+            return votoMapper.toVotoDto(voto);
+        }
+        return votoMapper.toVotoDto(new Voto());
     }
 
     @Override
